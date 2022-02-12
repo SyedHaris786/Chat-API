@@ -1,12 +1,13 @@
-// const { Client } = require("pg");
+const { Client } = require("pg");
 
-// const client = new Client({
-//   user: "admin",
-//   password: "admin123",
-//   host: "localhost",
-//   port: 5432,
-//   database: "node_login",
-// });
+const client = new Client({
+  user: "admin",
+  password: "admin123",
+  host: "localhost",
+  port: 5432,
+  database: "node_login",
+});
+client.connect()
 // The promises way
 
 // const connectPg = () => {
@@ -47,18 +48,17 @@
 //   ssl: isProduction
 // });
 
-const Pool = require('pg').Pool;
+// const Pool = require('pg').Pool;
 
 
-const pool = new Pool({  
-  user: "admin",
-  password: "admin123",
-  host: "localhost",
-  port: 5432,
-  database: "node_login",
-});
+// const pool = new Pool({  
+//   user: "admin",
+//   password: "admin123",
+//   host: "localhost",
+//   port: 5432,
+//   database: "node_login",
+// });
 
-
-module.exports = { pool };
+module.exports = { client };
 
 // module.exports = connectPg

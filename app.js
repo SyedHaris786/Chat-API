@@ -6,8 +6,8 @@ const loginRouter  = require("./Routes/login")
 
 
 // const { pool } = require('./db/connect');
-// app.use(express.json());
-// app.use(express.urlencoded({extended:false}));
+app.use(express.json());
+app.use(express.urlencoded({extended:false}));
 
 // app.use(express.static('./Public'));
 

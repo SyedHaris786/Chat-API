@@ -1,5 +1,6 @@
 const { client } = require('../db/connect');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { CommandCompleteMessage } = require('pg-protocol/dist/messages');
 
 // Registration code
@@ -40,7 +41,7 @@ const register = async (req,res) =>{
 const login = async  (req,res)=> {
   const {email, password} = req.body;
 
-const enteredPassword = await client.query (`SELECT password FROM users where email = $1;`,[email],(err,result)=> {
+const enteredPassword = await client.query (`SELECT username, password FROM users where email = $1;`,[email],(err,result)=> {
 
   try {
   
@@ -49,20 +50,25 @@ const enteredPassword = await client.query (`SELECT password FROM users where em
   } else {
 
     const validPass = result.rows[0].password;
-    console.log(validPass);
+    
     bcrypt.compare(password,validPass,(err,isMatch)=>{
       if (err) {
         console.log(err);
       }
 
       if (isMatch) {
-        console.log("Successful")
+    const username = result.rows[0].username;
+    
+    const jawt = jwt.sign({'username':username},process.env.JWT_SECRET,{
+          expiresIn:'30d',
+      })
+
+      res.status(200).json({'token':jawt});
+      
       } else {
         //password is incorrect
         console.log("Password is incorrect");
       }
-
-
 
     });
   }
@@ -72,16 +78,7 @@ const enteredPassword = await client.query (`SELECT password FROM users where em
     console.log(err);
   }
 
-
-
-
-
-
 });
-
-
-
-
 
 }
 

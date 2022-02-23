@@ -1,7 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+
+//Middleware import
+const authenticateUser = require("./Middleware/authValidation")
+
+//Router 
 const loginRouter  = require("./Routes/login")
+const blogRouter = require("./Routes/blog")
+
 
 
 
@@ -13,7 +20,7 @@ app.use(express.urlencoded({extended:false}));
 
 
 app.use('/api/v1', loginRouter)
-
+app.use('/api/v1',authenticateUser, blogRouter)
 
 
 const port = process.env.PORT || 5000;

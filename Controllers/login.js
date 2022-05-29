@@ -1,4 +1,5 @@
-const { client } = require('../db/connect');
+require('dotenv');
+const pool  = require('../db/connect');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { CommandCompleteMessage } = require('pg-protocol/dist/messages');
@@ -21,18 +22,18 @@ const register = async (req,res) =>{
   
   console.log({username, email, hashedPassword});
 
-  await client.query(`SELECT * FROM users WHERE email = '${email}'`, (err,result)=>{
+  await pool.query(`SELECT * FROM users WHERE email = '${email}'`, (err,result)=>{
     //Proper error handlling needs to be added 
     if (err) {
       console.log(err)
     }
 
-    if (result.rows.length>0){
+    if (result.rows==1){
       res.send('Email Already Exist');
     }
   });       
     
-  await client.query(`insert into users (username,email, password) values ('${username}','${email}', '${hashedPassword}');`);         
+  await pool.query(`insert into users (username,email, password) values ('${username}','${email}', '${hashedPassword}');`);         
   res.send("User added successfully")
       
 }
@@ -41,16 +42,16 @@ const register = async (req,res) =>{
 const login = async  (req,res)=> {
   const {email, password} = req.body;
 
-const enteredPassword = await client.query (`SELECT username, password FROM users where email = $1;`,[email],(err,result)=> {
+const enteredPassword = await pool.query (`SELECT username, password FROM users where email = $1;`,[email],(err,result)=> {
 
   try {
   
-  if(result.rows.length===0){
+  if(result.rows.length==0){
   res.send('Please enter a valid password')
   } else {
 
     const validPass = result.rows[0].password;
-    
+   
     bcrypt.compare(password,validPass,(err,isMatch)=>{
       if (err) {
         console.log(err);
@@ -67,7 +68,7 @@ const enteredPassword = await client.query (`SELECT username, password FROM user
       
       } else {
         //password is incorrect
-        console.log("Password is incorrect");
+        res.send("Password is incorrect");
       }
 
     });
@@ -83,18 +84,5 @@ const enteredPassword = await client.query (`SELECT username, password FROM user
 }
 
 
-//Dashboard
-const dashboard = async (req,res) =>{
-//    client.query('SELECT * FROM users');
 
-  const a =  
-    await client.query('SELECT * from users;');
-
-//   res.send("reached");
-  res.send(a.rows);
-      
-}
-
-
-
-module.exports = {login, register, dashboard}
+module.exports = {login, register}
